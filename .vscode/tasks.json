@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup Devcontainer",
+      "type": "shell",
+      "command": "./.devcontainer/generate_devcontainer.sh",
+      "args": [
+        "${input:rosDistro}"
+      ],
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "rosDistro",
+      "type": "pickString",
+      "description": "Select ROS2 distribution",
+      "options": [
+        "humble",
+        "iron",
+        "jazzy",
+        "rolling"
+      ],
+      "default": "humble"
+    }
+  ]
+}

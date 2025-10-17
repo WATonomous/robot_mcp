@@ -1,0 +1,42 @@
+---
+name: Release Deep ROS
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-test-and-release:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - ros_distro: rolling
+            debian_distro: noble
+            ubuntu_version: '24.04'
+
+          - ros_distro: kilted
+            debian_distro: noble
+            ubuntu_version: '24.04'
+
+          - ros_distro: jazzy
+            debian_distro: noble
+            ubuntu_version: '24.04'
+
+          - ros_distro: humble
+            debian_distro: jammy
+            ubuntu_version: '22.04'
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: ${{ matrix.ros_distro }}
+      - uses: ./.github/actions/build-and-test
+
+      - uses: watonomous/bloom-release-ros@v0.1.0
+        with:
+          ros_distro: ${{ matrix.ros_distro }}
+          debian_distro: ${{ matrix.debian_distro }}
+          packages_dir: ${{ matrix.packages_dir }}

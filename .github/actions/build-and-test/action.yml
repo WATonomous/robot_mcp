@@ -1,0 +1,47 @@
+---
+name: Build and Test
+description: Common build and test logic for Deep ROS
+
+inputs:
+  ros-distro:
+    description: 'ROS distribution to use'
+    required: true
+    default: 'humble'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt update
+        sudo apt install -y python3-colcon-common-extensions \
+                            python3-pip \
+                            build-essential \
+
+    - name: Install rosdep dependencies
+      shell: bash
+      run: |
+        sudo rosdep init || true
+        rosdep update
+        rosdep install --from-paths . --ignore-src -r -y
+
+    - name: Build workspace
+      shell: bash
+      run: |
+        source /opt/ros/${{ inputs.ros-distro }}/setup.bash
+        colcon build --merge-install
+
+    - name: Run tests
+      shell: bash
+      run: |
+        source /opt/ros/${{ inputs.ros-distro }}/setup.bash
+        colcon test --merge-install --event-handlers console_cohesion+
+        colcon test-result --verbose
+
+    - name: Upload test logs as artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: colcon-test-logs
+        path: |
+          build/**/Testing/**/*.log

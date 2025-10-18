@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>robot_mcp_msg_pluginlib</name>
+  <version>0.1.0</version>
+  <description>Base plugin interface for robot_mcp message handlers</description>
+
+  <maintainer email="e23zhou@watonomous.ca">Eddy Zhou</maintainer>
+  <author email="hello@watonomous.ca">WATonomous</author>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Plugin system -->
+  <depend>pluginlib</depend>
+
+  <!-- JSON -->
+  <depend>nlohmann-json-dev</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

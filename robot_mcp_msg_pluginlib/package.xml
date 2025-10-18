@@ -6,8 +6,8 @@
   <description>Base plugin interface for robot_mcp message handlers</description>
 
   <maintainer email="e23zhou@watonomous.ca">Eddy Zhou</maintainer>
-  <author email="hello@watonomous.ca">WATonomous</author>
   <license>Apache 2.0</license>
+  <author email="hello@watonomous.ca">WATonomous</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

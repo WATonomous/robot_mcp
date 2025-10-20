@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>robot_mcp_server</name>
+  <version>0.1.0</version>
+  <description>MCP server for ROS2 robots - enables AI assistants to control robots via HTTP</description>
+
+  <maintainer email="e23zhou@watonomous.ca">Eddy Zhou</maintainer>
+  <license>Apache 2.0</license>
+  <author email="hello@watonomous.ca">WATonomous</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- ROS2 dependencies -->
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+  <depend>rclcpp_action</depend>
+  <depend>rclcpp_components</depend>
+  <depend>std_msgs</depend>
+
+  <!-- Plugin system -->
+  <depend>pluginlib</depend>
+  <depend>robot_mcp_msg_pluginlib</depend>
+
+  <!-- HTTP and JSON (system dependencies) -->
+  <depend>nlohmann-json-dev</depend>
+  <depend>libcpp-httplib-dev</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

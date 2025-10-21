@@ -1,3 +1,17 @@
+// Copyright (c) 2025-present WATonomous. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Copyright 2025 WATonomous
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +28,11 @@
 
 #include "robot_mcp_server/mcp_config/config_parser.hpp"
 
+#include <map>
 #include <set>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace robot_mcp::config
 {
@@ -233,10 +250,8 @@ std::map<std::string, ResourceGroupConfig> ConfigParser::parseResourceGroups(
     ResourceGroupConfig group;
     group.name = group_name;
 
-    group.max_concurrent = node->declare_parameter(
-      prefix + "max_concurrent", group.max_concurrent);
-    group.interruptible = node->declare_parameter(
-      prefix + "interruptible", group.interruptible);
+    group.max_concurrent = node->declare_parameter(prefix + "max_concurrent", group.max_concurrent);
+    group.interruptible = node->declare_parameter(prefix + "interruptible", group.interruptible);
 
     if (node->has_parameter(prefix + "conflict_resolution")) {
       std::string cr_str = node->declare_parameter(prefix + "conflict_resolution", "error");
@@ -268,14 +283,12 @@ void ConfigParser::validate(const MCPServerConfig & config)
   // Validate server config
   if (config.server.port < 1 || config.server.port > 65535) {
     throw ConfigParseException(
-      "Invalid port number: " + std::to_string(config.server.port) +
-      ". Must be between 1 and 65535");
+      "Invalid port number: " + std::to_string(config.server.port) + ". Must be between 1 and 65535");
   }
 
   if (config.server.max_connections < 1) {
     throw ConfigParseException(
-      "Invalid max_connections: " + std::to_string(config.server.max_connections) +
-      ". Must be at least 1");
+      "Invalid max_connections: " + std::to_string(config.server.max_connections) + ". Must be at least 1");
   }
 
   // Check for duplicate names
@@ -307,8 +320,7 @@ void ConfigParser::validate(const MCPServerConfig & config)
     for (const auto & group_name : topic.resource_groups) {
       if (!config.resource_groups.count(group_name)) {
         throw ConfigParseException(
-          "Topic '" + topic.name + "' references undefined resource group: '" +
-          group_name + "'");
+          "Topic '" + topic.name + "' references undefined resource group: '" + group_name + "'");
       }
     }
   }
@@ -317,8 +329,7 @@ void ConfigParser::validate(const MCPServerConfig & config)
     for (const auto & group_name : service.resource_groups) {
       if (!config.resource_groups.count(group_name)) {
         throw ConfigParseException(
-          "Service '" + service.name + "' references undefined resource group: '" +
-          group_name + "'");
+          "Service '" + service.name + "' references undefined resource group: '" + group_name + "'");
       }
     }
   }
@@ -327,8 +338,7 @@ void ConfigParser::validate(const MCPServerConfig & config)
     for (const auto & group_name : action.resource_groups) {
       if (!config.resource_groups.count(group_name)) {
         throw ConfigParseException(
-          "Action '" + action.name + "' references undefined resource group: '" +
-          group_name + "'");
+          "Action '" + action.name + "' references undefined resource group: '" + group_name + "'");
       }
     }
   }

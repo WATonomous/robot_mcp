@@ -21,8 +21,8 @@
 
 #include <catch2/catch.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
 #include <robot_mcp_test/robot_mcp_test.hpp>
+#include <std_msgs/msg/string.hpp>
 
 #include "test_nodes/publisher_test_node.hpp"
 #include "test_nodes/subscriber_test_node.hpp"
@@ -35,7 +35,8 @@ TEST_CASE_METHOD(robot_mcp::test::TestExecutorFixture, "Multiple nodes with Test
   std::string test_topic = "/multi_node_topic";
 
   // Create publisher and subscriber test nodes
-  auto pub_node = std::make_shared<robot_mcp::test::PublisherTestNode<std_msgs::msg::String>>(test_topic, "publisher_node");
+  auto pub_node =
+    std::make_shared<robot_mcp::test::PublisherTestNode<std_msgs::msg::String>>(test_topic, "publisher_node");
   auto sub_node =
     std::make_shared<robot_mcp::test::SubscriberTestNode<std_msgs::msg::String>>(test_topic, "subscriber_node");
 

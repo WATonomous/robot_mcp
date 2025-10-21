@@ -19,14 +19,15 @@
 
 #include <catch2/catch.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <robot_mcp_test/robot_mcp_test.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <std_srvs/srv/set_bool.hpp>
-#include <robot_mcp_test/robot_mcp_test.hpp>
 
 namespace robot_mcp
 {
 
-TEST_CASE_METHOD(robot_mcp::test::TestExecutorFixture, "Using TestExecutorFixture from robot_mcp_test", "[deep_fixture]")
+TEST_CASE_METHOD(
+  robot_mcp::test::TestExecutorFixture, "Using TestExecutorFixture from robot_mcp_test", "[deep_fixture]")
 {
   // Create a test node
   auto test_node = std::make_shared<rclcpp::Node>("fixture_test_node");

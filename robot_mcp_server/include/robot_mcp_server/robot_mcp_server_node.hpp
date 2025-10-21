@@ -1,3 +1,17 @@
+// Copyright (c) 2025-present WATonomous. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Copyright 2025 WATonomous
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +59,7 @@ public:
    * @param node_name Node name
    * @param options Node options for configuration
    */
-  MCPServerNode(const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+  explicit MCPServerNode(const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   /**
    * @brief Destructor
@@ -71,8 +85,8 @@ protected:
    * @param state Current lifecycle state
    * @return SUCCESS or FAILURE
    */
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_configure(const rclcpp_lifecycle::State & state) override;
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
+    const rclcpp_lifecycle::State & state) override;
 
   /**
    * @brief On Activate
@@ -83,8 +97,8 @@ protected:
    * @param state Current lifecycle state
    * @return SUCCESS or FAILURE
    */
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_activate(const rclcpp_lifecycle::State & state) override;
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
+    const rclcpp_lifecycle::State & state) override;
 
   /**
    * @brief On Deactivate
@@ -95,8 +109,8 @@ protected:
    * @param state Current lifecycle state
    * @return SUCCESS or FAILURE
    */
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_deactivate(const rclcpp_lifecycle::State & state) override;
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(
+    const rclcpp_lifecycle::State & state) override;
 
   /**
    * @brief On Cleanup
@@ -107,8 +121,8 @@ protected:
    * @param state Current lifecycle state
    * @return SUCCESS or FAILURE
    */
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_cleanup(const rclcpp_lifecycle::State & state) override;
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(
+    const rclcpp_lifecycle::State & state) override;
 
   /**
    * @brief On Shutdown
@@ -118,15 +132,15 @@ protected:
    * @param state Current lifecycle state
    * @return SUCCESS or FAILURE
    */
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_shutdown(const rclcpp_lifecycle::State & state) override;
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(
+    const rclcpp_lifecycle::State & state) override;
 
 private:
   config::MCPServerConfig config_;  ///< Parsed configuration
 
-  // TODO: Add plugin system components
-  // TODO: Add HTTP server
-  // TODO: Add router
+  // TODO(eddy): Add plugin system components
+  // TODO(eddy): Add HTTP server
+  // TODO(eddy): Add router
 };
 
 }  // namespace robot_mcp

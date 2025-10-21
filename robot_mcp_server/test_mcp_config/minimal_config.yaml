@@ -1,0 +1,5 @@
+mcp_http_server:
+  ros__parameters:
+    server:
+      host: "localhost"
+      port: 8080

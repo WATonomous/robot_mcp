@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 cmake_minimum_required(VERSION 3.22)
-project(robot_mcp_server)
+project(robot_mcp_test)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
@@ -26,44 +27,25 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(rclcpp_action REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(robot_mcp_msg_pluginlib REQUIRED)
-find_package(nlohmann_json REQUIRED)
-
 set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Server library
-add_library(${PROJECT_NAME} SHARED
-  src/robot_mcp_server_node.cpp
-  src/mcp_config/config_parser.cpp
+# robot_mcp_test library
+set(WATO_TEST_LIB ${PROJECT_NAME}_lib)
+add_library(${WATO_TEST_LIB} SHARED
+  src/test_executor_fixture.cpp
 )
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(${WATO_TEST_LIB} PUBLIC
   $<BUILD_INTERFACE:${include_dir}>
   $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(${PROJECT_NAME}
-  PUBLIC
-    robot_mcp_msg_pluginlib::robot_mcp_msg_pluginlib
+target_link_libraries(${WATO_TEST_LIB}
   PRIVATE
     rclcpp::rclcpp
     rclcpp_lifecycle::rclcpp_lifecycle
-    rclcpp_action::rclcpp_action
-    rclcpp_components::component
-    ${std_msgs_TARGETS}
-    pluginlib::pluginlib
-    nlohmann_json::nlohmann_json
 )
 
-# Register as a rclcpp_components component
-rclcpp_components_register_node(${PROJECT_NAME}
-  PLUGIN "robot_mcp::MCPServerNode"
-  EXECUTABLE ${PROJECT_NAME}_node
-)
-
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS
+  ${WATO_TEST_LIB}
   EXPORT ${PROJECT_NAME}Targets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -79,35 +61,35 @@ install(DIRECTORY include/
   DESTINATION include
 )
 
-# Install test configuration files
-install(DIRECTORY test_mcp_config/
-  DESTINATION share/${PROJECT_NAME}/test_mcp_config
+install(FILES cmake/add_robot_mcp_test.cmake
+  DESTINATION share/${PROJECT_NAME}/cmake
 )
 
 if(BUILD_TESTING)
-  # Find robot_mcp_test package
-  find_package(robot_mcp_test REQUIRED)
-  find_package(launch_testing_ament_cmake REQUIRED)
+  # Include our custom test function
+  include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/add_robot_mcp_test.cmake)
 
-  # Include the custom test function
-  include(${robot_mcp_test_DIR}/add_robot_mcp_test.cmake)
+  # Find test dependencies
+  find_package(std_msgs REQUIRED)
+  find_package(std_srvs REQUIRED)
 
-  # Add lifecycle tests
-  add_robot_mcp_test(test_lifecycle
-    test/test_lifecycle.cpp
+  # Add the basic example test
+  add_robot_mcp_test(test_basic_example
+    test/test_basic_example.cpp
     LIBRARIES
-      ${PROJECT_NAME}
+      ${std_msgs_TARGETS}
+      ${std_srvs_TARGETS}
   )
 
-  # Add configuration parser launch tests
-  add_launch_test(
-    test_mcp_config/test_complete_config.py
-  )
-
-  add_launch_test(
-    test_mcp_config/test_minimal_config.py
+  # Add ROS test with multiple library dependencies
+  add_robot_mcp_test(test_with_ros
+    test/test_with_ros.cpp
+    LIBRARIES
+      ${std_msgs_TARGETS}
   )
 endif()
 
 ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
-ament_package()
+ament_package(
+  CONFIG_EXTRAS "${PROJECT_NAME}-extras.cmake"
+)

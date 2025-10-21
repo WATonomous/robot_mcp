@@ -26,6 +26,9 @@
   <depend>nlohmann-json-dev</depend>
   <depend>libcpp-httplib-dev</depend>
 
+  <!-- Test dependencies -->
+  <test_depend>robot_mcp_test</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

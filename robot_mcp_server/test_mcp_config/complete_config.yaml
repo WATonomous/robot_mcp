@@ -1,0 +1,61 @@
+mcp_http_server:
+  ros__parameters:
+    server:
+      host: "127.0.0.1"
+      port: 9090
+      api_key: "test_secret_key"
+      max_connections: 50
+      timeout_ms: 15000
+      enable_cors: false
+
+    # Resource groups list (Nav2 pattern)
+    resource_groups: ["base_motion", "sensor_access"]
+
+    base_motion:
+      max_concurrent: 1
+      interruptible: true
+      conflict_resolution: "cancel"
+
+    sensor_access:
+      max_concurrent: 5
+      interruptible: false
+      conflict_resolution: "queue"
+
+    # Topics list (Nav2 pattern)
+    topics: ["battery", "cmd_vel"]
+
+    battery:
+      topic: "/battery_state"
+      msg_type: "sensor_msgs/msg/BatteryState"
+      plugin: "robot_mcp_sensor_msg_plugins::BatteryStatePlugin"
+      subscribe: true
+      publish: false
+      resource_groups: ["sensor_access"]
+
+    cmd_vel:
+      topic: "/cmd_vel"
+      msg_type: "geometry_msgs/msg/Twist"
+      plugin: "robot_mcp_geometry_msg_plugins::TwistPlugin"
+      subscribe: false
+      publish: true
+      resource_groups: ["base_motion"]
+
+    # Services list (Nav2 pattern)
+    services: ["reset"]
+
+    reset:
+      service: "/reset"
+      srv_type: "std_srvs/srv/Trigger"
+      plugin: "robot_mcp_std_srv_plugins::TriggerPlugin"
+      timeout_ms: 3000
+
+    # Actions list (Nav2 pattern)
+    actions: ["navigate"]
+
+    navigate:
+      action: "/navigate_to_pose"
+      action_type: "nav2_msgs/action/NavigateToPose"
+      plugin: "robot_mcp_nav_msg_plugins::NavigateToPosePlugin"
+      timeout_ms: 60000
+      cancellable: true
+      resource_groups: ["base_motion"]

@@ -15,15 +15,41 @@
 launch:
   # Launch arguments
   - arg:
-      name: config
-      default: ""
+      name: params_file
+      default: "$(find-pkg-share robot_mcp_bringup)/config/minimal.yaml"
       description: "Path to robot_mcp configuration file"
 
-  # Node will be added in Phase 5 (Lifecycle Integration)
-  # - node:
-  #     pkg: robot_mcp_server
-  #     exec: robot_mcp_server_node
-  #     name: robot_mcp_server
-  #     param:
-  #       - from: $(var config)
-  #     output: screen
+  - arg:
+      name: autostart
+      default: "true"
+      description: "Automatically configure and activate the lifecycle node"
+
+  - arg:
+      name: namespace
+      default: ""
+      description: "Top-level namespace"
+
+  # robot_mcp_server lifecycle node
+  - node:
+      pkg: robot_mcp_server
+      exec: robot_mcp_server_node
+      name: mcp_http_server
+      namespace: $(var namespace)
+      output: screen
+      emulate_tty: true
+      param:
+        - from: $(var params_file)
+
+  # Nav2 lifecycle manager to manage robot_mcp_server lifecycle
+  - node:
+      pkg: nav2_lifecycle_manager
+      exec: lifecycle_manager
+      name: robot_mcp_lifecycle_manager
+      namespace: $(var namespace)
+      output: screen
+      emulate_tty: true
+      param:
+        - name: autostart
+          value: $(var autostart)
+        - name: node_names
+          value: ['mcp_http_server']

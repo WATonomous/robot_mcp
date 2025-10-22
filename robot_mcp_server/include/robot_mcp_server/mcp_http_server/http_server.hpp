@@ -26,20 +26,21 @@
 
 #include "robot_mcp_server/mcp_config/config_types.hpp"
 
-// Forward declarations to avoid including httplib in header
+// Forward declarations for httplib.h
 namespace httplib {
 class Server;
 struct Request;
 struct Response;
 }  // namespace httplib
 
-namespace robot_mcp::http
-{
-
-// Forward declarations
+// Forward declaractions for mcp http server components
+namespace robot_mcp::http {
 class AuthMiddleware;
 class JSONRPCHandler;
+} // namespace robot_mcp::http
 
+namespace robot_mcp::http
+{
 /**
  * @brief HTTP server for MCP protocol
  *

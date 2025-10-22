@@ -31,6 +31,8 @@
 #include <memory>
 #include <string>
 
+#include <bondcpp/bond.hpp>
+
 #include "robot_mcp_server/mcp_config/config_parser.hpp"
 #include "robot_mcp_server/mcp_http_server/http_server.hpp"
 
@@ -64,6 +66,9 @@ CallbackReturn MCPServerNode::on_configure(const rclcpp_lifecycle::State & /*sta
     // Parse configuration from ROS2 parameters
     config_ = config::ConfigParser::parse(shared_from_this());
 
+    // Setup bond for lifecycle manager
+    setup_bond();
+
     RCLCPP_INFO(get_logger(), "Configuration loaded successfully:");
     RCLCPP_INFO(get_logger(), "  Server: %s:%d", config_.server.host.c_str(), config_.server.port);
     RCLCPP_INFO(
@@ -94,6 +99,12 @@ CallbackReturn MCPServerNode::on_activate(const rclcpp_lifecycle::State & /*stat
   RCLCPP_INFO(get_logger(), "Activating MCP server...");
 
   try {
+    // Start bond heartbeat with lifecycle manager
+    if (bond_) {
+      bond_->start();
+      RCLCPP_INFO(get_logger(), "Bond heartbeat started");
+    }
+
     // TODO(Phase 4): Initialize plugin system
     // TODO(Phase 3): Initialize router
 
@@ -128,6 +139,12 @@ CallbackReturn MCPServerNode::on_deactivate(const rclcpp_lifecycle::State & /*st
       http_server_->stop();
     }
 
+    // Stop bond heartbeat
+    if (bond_) {
+      bond_.reset();
+      RCLCPP_INFO(get_logger(), "Bond heartbeat stopped");
+    }
+
     // TODO(Phase 3): Cancel all active operations
     // TODO(Phase 4): Keep plugins loaded
 
@@ -148,6 +165,11 @@ CallbackReturn MCPServerNode::on_cleanup(const rclcpp_lifecycle::State & /*state
   try {
     // Release HTTP server resources
     http_server_.reset();
+
+    // Release bond resources
+    if (bond_) {
+      bond_.reset();
+    }
 
     // TODO(Phase 4): Unload all plugins
     // TODO(Phase 3): Clear router
@@ -174,6 +196,11 @@ CallbackReturn MCPServerNode::on_shutdown(const rclcpp_lifecycle::State & /*stat
     if (http_server_) {
       http_server_->stop();
       http_server_.reset();
+    }
+
+    // Release bond
+    if (bond_) {
+      bond_.reset();
     }
 
     // TODO(Phase 3): Cancel all operations
@@ -209,6 +236,32 @@ nlohmann::json MCPServerNode::handleMCPRequest(const nlohmann::json & request)
       {"phase", 2}
     }}
   };
+}
+
+void MCPServerNode::setup_bond()
+{
+  if (!config_.server.bond_enabled) {
+    RCLCPP_INFO(get_logger(), "Bond support is disabled");
+    return;
+  }
+
+  RCLCPP_INFO(get_logger(), "Setting up bond connection for lifecycle manager...");
+
+  // Create bond with lifecycle manager
+  bond_ = std::make_unique<bond::Bond>(
+    "/bond",
+    get_name(),
+    shared_from_this());
+
+  // Configure bond parameters from config
+  bond_->setHeartbeatPeriod(config_.server.bond_heartbeat_period);
+  bond_->setHeartbeatTimeout(config_.server.bond_timeout);
+
+  RCLCPP_INFO(
+    get_logger(),
+    "Bond configured: timeout=%.2fs, period=%.2fs",
+    config_.server.bond_timeout,
+    config_.server.bond_heartbeat_period);
 }
 
 }  // namespace robot_mcp

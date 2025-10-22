@@ -31,7 +31,9 @@ find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(robot_mcp_msg_pluginlib REQUIRED)
+find_package(bondcpp REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -47,6 +49,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${include_dir}>
   $<INSTALL_INTERFACE:include>
 )
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+  CPPHTTPLIB_OPENSSL_SUPPORT
+)
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
     robot_mcp_msg_pluginlib::robot_mcp_msg_pluginlib
@@ -57,7 +62,11 @@ target_link_libraries(${PROJECT_NAME}
     rclcpp_components::component
     ${std_msgs_TARGETS}
     pluginlib::pluginlib
+    bondcpp::bondcpp
     nlohmann_json::nlohmann_json
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    cpp-httplib
 )
 
 # Register as a rclcpp_components component

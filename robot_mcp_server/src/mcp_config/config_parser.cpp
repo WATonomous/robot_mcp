@@ -81,6 +81,16 @@ ServerConfig ConfigParser::parseServerConfig(rclcpp_lifecycle::LifecycleNode::Sh
   config.timeout_ms = node->declare_parameter("server.timeout_ms", config.timeout_ms);
   config.enable_cors = node->declare_parameter("server.enable_cors", config.enable_cors);
 
+  // SSL/HTTPS configuration
+  config.enable_https = node->declare_parameter("server.enable_https", config.enable_https);
+  config.ssl_cert_path = node->declare_parameter("server.ssl_cert_path", config.ssl_cert_path);
+  config.ssl_key_path = node->declare_parameter("server.ssl_key_path", config.ssl_key_path);
+
+  // Bond configuration for lifecycle manager
+  config.bond_enabled = node->declare_parameter("server.bond_enabled", config.bond_enabled);
+  config.bond_timeout = node->declare_parameter("server.bond_timeout", config.bond_timeout);
+  config.bond_heartbeat_period = node->declare_parameter("server.bond_heartbeat_period", config.bond_heartbeat_period);
+
   // Optional API key
   if (node->has_parameter("server.api_key")) {
     config.api_key = node->get_parameter("server.api_key").as_string();
@@ -290,6 +300,18 @@ void ConfigParser::validate(const MCPServerConfig & config)
   if (config.server.max_connections < 1) {
     throw ConfigParseException(
       "Invalid max_connections: " + std::to_string(config.server.max_connections) + ". Must be at least 1");
+  }
+
+  // Validate HTTPS configuration
+  if (config.server.enable_https) {
+    if (config.server.ssl_cert_path.empty()) {
+      throw ConfigParseException(
+        "HTTPS is enabled but ssl_cert_path is not specified");
+    }
+    if (config.server.ssl_key_path.empty()) {
+      throw ConfigParseException(
+        "HTTPS is enabled but ssl_key_path is not specified");
+    }
   }
 
   // Check for duplicate names

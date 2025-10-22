@@ -59,6 +59,14 @@ struct ServerConfig
   int max_connections{100};  ///< Maximum concurrent connections
   int timeout_ms{30000};  ///< Request timeout in milliseconds
   bool enable_cors{true};  ///< Enable CORS headers
+  bool enable_https{false};  ///< Enable HTTPS/TLS (requires OpenSSL)
+  std::string ssl_cert_path;  ///< Path to SSL certificate file (PEM format)
+  std::string ssl_key_path;  ///< Path to SSL private key file (PEM format)
+
+  // Bond configuration for lifecycle manager compatibility
+  bool bond_enabled{true};  ///< Enable bond heartbeat with lifecycle manager
+  double bond_timeout{4.0};  ///< Bond heartbeat timeout in seconds
+  double bond_heartbeat_period{0.1};  ///< Bond heartbeat period in seconds
 };
 
 /**

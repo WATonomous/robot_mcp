@@ -57,8 +57,17 @@ void HTTPServer::start(const config::ServerConfig & config, RequestHandler handl
   enable_cors_ = config.enable_cors;
   request_handler_ = handler;
 
-  // Create components
-  server_ = std::make_unique<httplib::Server>();
+  // Create server (HTTP or HTTPS based on runtime configuration)
+  if (config.enable_https) {
+    RCLCPP_INFO(logger_, "Creating HTTPS server with SSL/TLS support");
+    server_ = std::make_unique<httplib::SSLServer>(
+      config.ssl_cert_path.c_str(),
+      config.ssl_key_path.c_str());
+  } else {
+    server_ = std::make_unique<httplib::Server>();
+  }
+
+  // Create auth and JSON-RPC components
   auth_ = std::make_unique<AuthMiddleware>(config.api_key);
   json_rpc_ = std::make_unique<JSONRPCHandler>();
 
@@ -76,7 +85,12 @@ void HTTPServer::start(const config::ServerConfig & config, RequestHandler handl
   running_.store(true);
   server_thread_ = std::thread(&HTTPServer::serverThreadFunc, this);
 
-  RCLCPP_INFO(logger_, "HTTP server started on %s:%d", host_.c_str(), port_);
+  // Log server status
+  const char* protocol = config.enable_https ? "HTTPS" : "HTTP";
+  RCLCPP_INFO(logger_, "%s server started on %s:%d", protocol, host_.c_str(), port_);
+  if (config.enable_https) {
+    RCLCPP_INFO(logger_, "SSL/TLS: ENABLED (cert: %s)", config.ssl_cert_path.c_str());
+  }
   if (auth_->isEnabled()) {
     RCLCPP_INFO(logger_, "Authentication: ENABLED");
   } else {
@@ -145,7 +159,7 @@ void HTTPServer::handleMCPEndpoint(const httplib::Request & req, httplib::Respon
   } catch (const nlohmann::json::parse_error & e) {
     RCLCPP_WARN(logger_, "JSON parse error: %s", e.what());
     auto error_response = JSONRPCHandler::formatError(
-      nullptr,
+      nlohmann::json(nullptr),
       JSONRPCHandler::PARSE_ERROR,
       "Parse error: Invalid JSON",
       e.what());
@@ -158,7 +172,7 @@ void HTTPServer::handleMCPEndpoint(const httplib::Request & req, httplib::Respon
   if (!JSONRPCHandler::validate(json_request)) {
     RCLCPP_WARN(logger_, "Invalid JSON-RPC request structure");
     auto error_response = JSONRPCHandler::formatError(
-      json_request.contains("id") ? json_request["id"] : nullptr,
+      json_request.contains("id") ? json_request["id"] : nlohmann::json(nullptr),
       JSONRPCHandler::INVALID_REQUEST,
       "Invalid Request: Missing required JSON-RPC fields");
     res.status = 400;

@@ -32,6 +32,7 @@
 #include <string>
 
 #include <bondcpp/bond.hpp>
+#include <lifecycle_msgs/msg/state.hpp>
 
 #include "robot_mcp_server/mcp_config/config_parser.hpp"
 #include "robot_mcp_server/mcp_http_server/http_server.hpp"
@@ -55,6 +56,16 @@ MCPServerNode::MCPServerNode(const std::string & node_name, const rclcpp::NodeOp
 
 MCPServerNode::~MCPServerNode()
 {
+  auto current_state = get_current_state();
+
+  if (current_state.id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
+    on_deactivate(current_state);
+  }
+
+  if (current_state.id() == lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE) {
+    on_cleanup(current_state);
+  }
+
   RCLCPP_INFO(get_logger(), "MCP HTTP Server node destroyed");
 }
 
@@ -141,6 +152,7 @@ CallbackReturn MCPServerNode::on_deactivate(const rclcpp_lifecycle::State & /*st
 
     // Stop bond heartbeat
     if (bond_) {
+      bond_->breakBond();
       bond_.reset();
       RCLCPP_INFO(get_logger(), "Bond heartbeat stopped");
     }
@@ -168,6 +180,7 @@ CallbackReturn MCPServerNode::on_cleanup(const rclcpp_lifecycle::State & /*state
 
     // Release bond resources
     if (bond_) {
+      bond_->breakBond();
       bond_.reset();
     }
 
@@ -200,6 +213,11 @@ CallbackReturn MCPServerNode::on_shutdown(const rclcpp_lifecycle::State & /*stat
 
     // Release bond
     if (bond_) {
+      try {
+        bond_->breakBond();
+      } catch (...) {
+        // Ignore errors during emergency shutdown
+      }
       bond_.reset();
     }
 

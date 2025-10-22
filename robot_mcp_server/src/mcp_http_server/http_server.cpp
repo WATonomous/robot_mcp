@@ -81,6 +81,11 @@ void HTTPServer::start(const config::ServerConfig & config, RequestHandler handl
     this->handleMCPEndpoint(req, res);
   });
 
+  // Register OPTIONS /mcp endpoint for CORS preflight
+  server_->Options("/mcp", [this](const httplib::Request & req, httplib::Response & res) {
+    this->handleMCPEndpoint(req, res);
+  });
+
   // Start server in background thread
   running_.store(true);
   server_thread_ = std::thread(&HTTPServer::serverThreadFunc, this);

@@ -48,12 +48,12 @@ from rcl_interfaces.srv import GetParameters
 @pytest.mark.launch_test
 @launch_testing.markers.keep_alive
 def generate_test_description():
-    """Launch MCP server node with test configuration."""
+    """Launch MCP server node with minimal configuration."""
 
     # Get the test config directory
     pkg_share = get_package_share_directory("robot_mcp_server")
-    config_dir = os.path.join(pkg_share, "test_mcp_config")
-    config_file = os.path.join(config_dir, "complete_config.yaml")
+    config_dir = os.path.join(pkg_share, "test", "launch_tests")
+    config_file = os.path.join(config_dir, "minimal_config.yaml")
 
     mcp_server_node = launch_ros.actions.LifecycleNode(
         package="robot_mcp_server",
@@ -94,7 +94,7 @@ def generate_test_description():
     )
 
 
-class TestConfigParser(unittest.TestCase):
+class TestMinimalConfig(unittest.TestCase):
     """Active tests while the node is running."""
 
     @classmethod
@@ -108,13 +108,13 @@ class TestConfigParser(unittest.TestCase):
         rclpy.shutdown()
 
     def test_node_configures(self, proc_output):
-        """Verify the node configures successfully."""
+        """Verify the node configures successfully with minimal config."""
         # Wait for configuration success message
         proc_output.assertWaitFor("Configuration loaded successfully", timeout=10.0)
 
-    def test_server_config_loaded(self):
-        """Verify server configuration was loaded from YAML via ROS2 parameter API."""
-        node = Node("test_param_client")
+    def test_server_minimal_config_loaded(self):
+        """Verify server uses values from minimal_config.yaml via ROS2 parameter API."""
+        node = Node("test_minimal_param_client")
 
         try:
             # Create service client to query parameters
@@ -135,16 +135,16 @@ class TestConfigParser(unittest.TestCase):
             self.assertTrue(future.done(), "Parameter query timed out")
             response = future.result()
 
-            # Verify server config from complete_config.yaml
-            self.assertEqual(response.values[0].string_value, "127.0.0.1")
-            self.assertEqual(response.values[1].integer_value, 9090)
+            # Verify server config from minimal_config.yaml
+            self.assertEqual(response.values[0].string_value, "localhost")
+            self.assertEqual(response.values[1].integer_value, 8080)
 
         finally:
             node.destroy_node()
 
-    def test_topics_list_loaded(self):
-        """Verify topics list was loaded from YAML via ROS2 parameter API."""
-        node = Node("test_topics_client")
+    def test_no_topics_configured(self):
+        """Verify no topics are configured via ROS2 parameter API."""
+        node = Node("test_no_topics_client")
 
         try:
             # Create service client to query parameters
@@ -165,60 +165,16 @@ class TestConfigParser(unittest.TestCase):
             self.assertTrue(future.done(), "Parameter query timed out")
             response = future.result()
 
-            # Verify topics array from complete_config.yaml
+            # Verify topics array is empty or default (empty array)
             topics_array = response.values[0].string_array_value
-            self.assertEqual(len(topics_array), 2)
-            self.assertIn("battery", topics_array)
-            self.assertIn("cmd_vel", topics_array)
-
-        finally:
-            node.destroy_node()
-
-    def test_topic_configs_loaded(self):
-        """Verify individual topic configurations were loaded from YAML."""
-        node = Node("test_topic_config_client")
-
-        try:
-            # Create service client to query parameters
-            cli = node.create_client(GetParameters, "/mcp_http_server/get_parameters")
-
-            # Wait for service to be available
-            self.assertTrue(
-                cli.wait_for_service(timeout_sec=5.0), "Parameter service not available"
-            )
-
-            # Query battery topic config
-            request = GetParameters.Request()
-            request.names = [
-                "battery.topic",
-                "battery.msg_type",
-                "battery.plugin",
-                "battery.subscribe",
-            ]
-
-            future = cli.call_async(request)
-            rclpy.spin_until_future_complete(node, future, timeout_sec=5.0)
-
-            self.assertTrue(future.done(), "Parameter query timed out")
-            response = future.result()
-
-            # Verify battery topic config from complete_config.yaml
-            self.assertEqual(response.values[0].string_value, "/battery_state")
-            self.assertEqual(
-                response.values[1].string_value, "sensor_msgs/msg/BatteryState"
-            )
-            self.assertEqual(
-                response.values[2].string_value,
-                "robot_mcp_sensor_msg_plugins::BatteryStatePlugin",
-            )
-            self.assertTrue(response.values[3].bool_value)
+            self.assertEqual(len(topics_array), 0)
 
         finally:
             node.destroy_node()
 
 
 @launch_testing.post_shutdown_test()
-class TestConfigParserShutdown(unittest.TestCase):
+class TestMinimalConfigShutdown(unittest.TestCase):
     """Post-shutdown tests."""
 
     def test_exit_codes(self, proc_info):

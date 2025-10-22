@@ -92,8 +92,10 @@ install(DIRECTORY include/
 )
 
 # Install test configuration files
-install(DIRECTORY test_mcp_config/
-  DESTINATION share/${PROJECT_NAME}/test_mcp_config
+install(DIRECTORY test/launch_tests/
+  DESTINATION share/${PROJECT_NAME}/test/launch_tests
+  FILES_MATCHING
+  PATTERN "*.yaml"
 )
 
 if(BUILD_TESTING)
@@ -111,13 +113,24 @@ if(BUILD_TESTING)
       ${PROJECT_NAME}
   )
 
-  # Add configuration parser launch tests
+  # Add HTTP component tests (Catch2)
+  add_robot_mcp_test(test_http_components
+    test/test_http_components.cpp
+    LIBRARIES
+      ${PROJECT_NAME}
+  )
+
+  # Add launch tests
   add_launch_test(
-    test_mcp_config/test_complete_config.py
+    test/launch_tests/test_complete_config.py
   )
 
   add_launch_test(
-    test_mcp_config/test_minimal_config.py
+    test/launch_tests/test_minimal_config.py
+  )
+
+  add_launch_test(
+    test/launch_tests/test_http_integration.py
   )
 endif()
 

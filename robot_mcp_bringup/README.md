@@ -42,7 +42,7 @@ mcp_http_server:
 ros2 lifecycle get /mcp_http_server
 
 # Test endpoint
-curl -X POST http://localhost:8080/mcp/v1 \
+curl -X POST http://localhost:8080/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc": "2.0", "method": "test", "id": 1}'
 ```

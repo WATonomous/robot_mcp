@@ -35,7 +35,7 @@ colcon test --packages-select robot_mcp_server --event-handlers console_direct+
 
 # Manual test
 ros2 launch robot_mcp_bringup robot_mcp.launch.yaml
-curl -X POST http://localhost:8080/mcp/v1 -H "Content-Type: application/json" \
+curl -X POST http://localhost:8080/mcp -H "Content-Type: application/json" \
   -d '{"jsonrpc": "2.0", "method": "test", "id": 1}'
 ```
 

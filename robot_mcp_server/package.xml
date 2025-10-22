@@ -30,6 +30,8 @@
 
   <!-- Test dependencies -->
   <test_depend>robot_mcp_test</test_depend>
+  <test_depend>python3-requests</test_depend>
+  <test_depend>nav2_lifecycle_manager</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

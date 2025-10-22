@@ -13,7 +13,7 @@ colcon build --packages-select robot_mcp_server
 ros2 run robot_mcp_server robot_mcp_server_node --ros-args --params-file config.yaml
 
 # Test
-curl -X POST http://localhost:8080/mcp/v1 \
+curl -X POST http://localhost:8080/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc": "2.0", "method": "test", "id": 1}'
 ```

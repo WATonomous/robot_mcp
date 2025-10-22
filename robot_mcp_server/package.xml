@@ -17,6 +17,7 @@
   <depend>rclcpp_action</depend>
   <depend>rclcpp_components</depend>
   <depend>std_msgs</depend>
+  <depend>bondcpp</depend>
 
   <!-- Plugin system -->
   <depend>pluginlib</depend>
@@ -25,9 +26,12 @@
   <!-- HTTP and JSON (system dependencies) -->
   <depend>nlohmann-json-dev</depend>
   <depend>libcpp-httplib-dev</depend>
+  <depend>libssl-dev</depend>
 
   <!-- Test dependencies -->
   <test_depend>robot_mcp_test</test_depend>
+  <test_depend>python3-requests</test_depend>
+  <test_depend>nav2_lifecycle_manager</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

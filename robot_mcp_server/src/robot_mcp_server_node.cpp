@@ -31,7 +31,11 @@
 #include <memory>
 #include <string>
 
+#include <bondcpp/bond.hpp>
+#include <lifecycle_msgs/msg/state.hpp>
+
 #include "robot_mcp_server/mcp_config/config_parser.hpp"
+#include "robot_mcp_server/mcp_http_server/http_server.hpp"
 
 namespace robot_mcp
 {
@@ -52,6 +56,16 @@ MCPServerNode::MCPServerNode(const std::string & node_name, const rclcpp::NodeOp
 
 MCPServerNode::~MCPServerNode()
 {
+  auto current_state = get_current_state();
+
+  if (current_state.id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
+    on_deactivate(current_state);
+  }
+
+  if (current_state.id() == lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE) {
+    on_cleanup(current_state);
+  }
+
   RCLCPP_INFO(get_logger(), "MCP HTTP Server node destroyed");
 }
 
@@ -62,6 +76,9 @@ CallbackReturn MCPServerNode::on_configure(const rclcpp_lifecycle::State & /*sta
   try {
     // Parse configuration from ROS2 parameters
     config_ = config::ConfigParser::parse(shared_from_this());
+
+    // Setup bond for lifecycle manager
+    setup_bond();
 
     RCLCPP_INFO(get_logger(), "Configuration loaded successfully:");
     RCLCPP_INFO(get_logger(), "  Server: %s:%d", config_.server.host.c_str(), config_.server.port);
@@ -93,9 +110,22 @@ CallbackReturn MCPServerNode::on_activate(const rclcpp_lifecycle::State & /*stat
   RCLCPP_INFO(get_logger(), "Activating MCP server...");
 
   try {
-    // TODO(eddy): Initialize plugin system
-    // TODO(eddy): Start HTTP server
-    // TODO(eddy): Initialize router
+    // Start bond heartbeat with lifecycle manager
+    if (bond_) {
+      bond_->start();
+      RCLCPP_INFO(get_logger(), "Bond heartbeat started");
+    }
+
+    // TODO(Phase 4): Initialize plugin system
+    // TODO(Phase 3): Initialize router
+
+    // Create and start HTTP server
+    http_server_ = std::make_unique<http::HTTPServer>(get_logger());
+
+    // Bind request handler (placeholder for Phase 2)
+    auto handler = [this](const nlohmann::json & req) { return this->handleMCPRequest(req); };
+
+    http_server_->start(config_.server, handler);
 
     RCLCPP_INFO(
       get_logger(), "MCP server activated successfully on %s:%d", config_.server.host.c_str(), config_.server.port);
@@ -112,9 +142,20 @@ CallbackReturn MCPServerNode::on_deactivate(const rclcpp_lifecycle::State & /*st
   RCLCPP_INFO(get_logger(), "Deactivating MCP server...");
 
   try {
-    // TODO(eddy): Stop HTTP server
-    // TODO(eddy): Cancel all active operations
-    // TODO(eddy): Keep plugins loaded
+    // Stop HTTP server
+    if (http_server_) {
+      http_server_->stop();
+    }
+
+    // Stop bond heartbeat
+    if (bond_) {
+      bond_->breakBond();
+      bond_.reset();
+      RCLCPP_INFO(get_logger(), "Bond heartbeat stopped");
+    }
+
+    // TODO(Phase 3): Cancel all active operations
+    // TODO(Phase 4): Keep plugins loaded
 
     RCLCPP_INFO(get_logger(), "MCP server deactivated successfully");
 
@@ -131,9 +172,17 @@ CallbackReturn MCPServerNode::on_cleanup(const rclcpp_lifecycle::State & /*state
   RCLCPP_INFO(get_logger(), "Cleaning up MCP server...");
 
   try {
-    // TODO(eddy): Unload all plugins
-    // TODO(eddy): Clear router
-    // TODO(eddy): Release HTTP server resources
+    // Release HTTP server resources
+    http_server_.reset();
+
+    // Release bond resources
+    if (bond_) {
+      bond_->breakBond();
+      bond_.reset();
+    }
+
+    // TODO(Phase 4): Unload all plugins
+    // TODO(Phase 3): Clear router
 
     // Clear configuration
     config_ = config::MCPServerConfig{};
@@ -154,9 +203,23 @@ CallbackReturn MCPServerNode::on_shutdown(const rclcpp_lifecycle::State & /*stat
 
   try {
     // Perform emergency stop
-    // TODO(eddy): Stop HTTP server immediately
-    // TODO(eddy): Cancel all operations
-    // TODO(eddy): Unload plugins
+    if (http_server_) {
+      http_server_->stop();
+      http_server_.reset();
+    }
+
+    // Release bond
+    if (bond_) {
+      try {
+        bond_->breakBond();
+      } catch (...) {
+        // Ignore errors during emergency shutdown
+      }
+      bond_.reset();
+    }
+
+    // TODO(Phase 3): Cancel all operations
+    // TODO(Phase 4): Unload plugins
 
     RCLCPP_INFO(get_logger(), "MCP server shutdown completed");
 
@@ -166,6 +229,46 @@ CallbackReturn MCPServerNode::on_shutdown(const rclcpp_lifecycle::State & /*stat
     // Always return success for shutdown
     return CallbackReturn::SUCCESS;
   }
+}
+
+nlohmann::json MCPServerNode::handleMCPRequest(const nlohmann::json & request)
+{
+  // Phase 2 placeholder: Return "not implemented" for all requests
+  // This will be replaced by MCPRouter in Phase 3
+
+  std::string method = request.value("method", "unknown");
+
+  RCLCPP_INFO(get_logger(), "Received MCP request: %s (placeholder handler)", method.c_str());
+
+  // Return a basic response indicating Phase 2 completion
+  return {
+    {"message", "MCP server Phase 2 complete - HTTP layer working"},
+    {"method", method},
+    {"note", "Actual MCP protocol implementation coming in Phase 3"},
+    {"server_info", {{"name", "robot_mcp_server"}, {"version", "0.1.0"}, {"phase", 2}}}};
+}
+
+void MCPServerNode::setup_bond()
+{
+  if (!config_.server.bond_enabled) {
+    RCLCPP_INFO(get_logger(), "Bond support is disabled");
+    return;
+  }
+
+  RCLCPP_INFO(get_logger(), "Setting up bond connection for lifecycle manager...");
+
+  // Create bond with lifecycle manager
+  bond_ = std::make_unique<bond::Bond>("/bond", get_name(), shared_from_this());
+
+  // Configure bond parameters from config
+  bond_->setHeartbeatPeriod(config_.server.bond_heartbeat_period);
+  bond_->setHeartbeatTimeout(config_.server.bond_timeout);
+
+  RCLCPP_INFO(
+    get_logger(),
+    "Bond configured: timeout=%.2fs, period=%.2fs",
+    config_.server.bond_timeout,
+    config_.server.bond_heartbeat_period);
 }
 
 }  // namespace robot_mcp

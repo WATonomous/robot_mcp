@@ -31,7 +31,9 @@ find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(robot_mcp_msg_pluginlib REQUIRED)
+find_package(bondcpp REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -39,10 +41,16 @@ set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(${PROJECT_NAME} SHARED
   src/robot_mcp_server_node.cpp
   src/mcp_config/config_parser.cpp
+  src/mcp_http_server/auth_middleware.cpp
+  src/mcp_http_server/json_rpc_handler.cpp
+  src/mcp_http_server/http_server.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${include_dir}>
   $<INSTALL_INTERFACE:include>
+)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+  CPPHTTPLIB_OPENSSL_SUPPORT
 )
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
@@ -54,7 +62,11 @@ target_link_libraries(${PROJECT_NAME}
     rclcpp_components::component
     ${std_msgs_TARGETS}
     pluginlib::pluginlib
+    bondcpp::bondcpp
     nlohmann_json::nlohmann_json
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    cpp-httplib
 )
 
 # Register as a rclcpp_components component
@@ -80,8 +92,10 @@ install(DIRECTORY include/
 )
 
 # Install test configuration files
-install(DIRECTORY test_mcp_config/
-  DESTINATION share/${PROJECT_NAME}/test_mcp_config
+install(DIRECTORY test/launch_tests/
+  DESTINATION share/${PROJECT_NAME}/test/launch_tests
+  FILES_MATCHING
+  PATTERN "*.yaml"
 )
 
 if(BUILD_TESTING)
@@ -99,13 +113,24 @@ if(BUILD_TESTING)
       ${PROJECT_NAME}
   )
 
-  # Add configuration parser launch tests
+  # Add HTTP component tests (Catch2)
+  add_robot_mcp_test(test_http_components
+    test/test_http_components.cpp
+    LIBRARIES
+      ${PROJECT_NAME}
+  )
+
+  # Add launch tests
   add_launch_test(
-    test_mcp_config/test_complete_config.py
+    test/launch_tests/test_complete_config.py
   )
 
   add_launch_test(
-    test_mcp_config/test_minimal_config.py
+    test/launch_tests/test_minimal_config.py
+  )
+
+  add_launch_test(
+    test/launch_tests/test_http_integration.py
   )
 endif()
 

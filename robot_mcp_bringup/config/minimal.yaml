@@ -1,10 +1,27 @@
 # Minimal robot_mcp configuration example
-# This will be populated in Phase 2 (Configuration System)
+# For local/LAN use (HTTP with optional API key)
 
 mcp_http_server:
   ros__parameters:
+    # HTTP server configuration
     server:
       host: "0.0.0.0"
       port: 8080
+      enable_https: false  # Use HTTP for local networks
+      # api_key: "your-secret-key-here"  # Uncomment to enable API key auth
+      thread_pool_size: 10
+      max_connections: 100
+      timeout_ms: 30000
+      enable_cors: true
 
-    # Example actions, services, and topics will be added later
+      # SSL/HTTPS configuration (optional, for production)
+      # enable_https: true
+      # ssl_cert_path: "/etc/letsencrypt/live/robot.example.com/fullchain.pem"
+      # ssl_key_path: "/etc/letsencrypt/live/robot.example.com/privkey.pem"
+
+    # Topics, services, and actions will be configured in Phase 3+
+    # Example structure (Phase 5+):
+    # topics: []
+    # services: []
+    # actions: []
+    # resource_groups: []

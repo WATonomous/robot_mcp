@@ -32,9 +32,22 @@
 #include <memory>
 #include <string>
 
+#include <nlohmann/json.hpp>
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "robot_mcp_server/mcp_config/config_types.hpp"
+
+// Forward declarations
+namespace robot_mcp::http
+{
+class HTTPServer;
+}
+
+namespace bond
+{
+class Bond;
+}
 
 namespace robot_mcp
 {
@@ -136,11 +149,36 @@ protected:
     const rclcpp_lifecycle::State & state) override;
 
 private:
+  /**
+   * @brief Handle MCP request (Phase 2 temporary implementation)
+   *
+   * This is a temporary implementation for Phase 2 testing that returns
+   * a basic response to verify the HTTP layer is working.
+   * Will be replaced by MCPRouter dispatch in Phase 3.
+   *
+   * @param request JSON-RPC request
+   * @return JSON-RPC result
+   */
+  nlohmann::json handleMCPRequest(const nlohmann::json & request);
+
+  /**
+   * @brief Setup bond connection for lifecycle manager
+   */
+  void setup_bond();
+
   config::MCPServerConfig config_;  ///< Parsed configuration
 
-  // TODO(eddy): Add plugin system components
-  // TODO(eddy): Add HTTP server
-  // TODO(eddy): Add router
+  // HTTP server (Phase 2)
+  std::unique_ptr<http::HTTPServer> http_server_;
+
+  // Bond support for lifecycle manager
+  std::unique_ptr<bond::Bond> bond_;
+  bool bond_enabled_;
+  double bond_timeout_;
+  double bond_heartbeat_period_;
+
+  // TODO(Phase 3): Add router
+  // TODO(Phase 4): Add plugin system components
 };
 
 }  // namespace robot_mcp

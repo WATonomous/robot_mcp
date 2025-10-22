@@ -14,6 +14,8 @@
 
 #include "robot_mcp_server/mcp_http_server/json_rpc_handler.hpp"
 
+#include <string>
+
 namespace robot_mcp::http
 {
 
@@ -54,37 +56,21 @@ bool JSONRPCHandler::validate(const nlohmann::json & request)
   return true;
 }
 
-nlohmann::json JSONRPCHandler::formatSuccess(
-  const nlohmann::json & id,
-  const nlohmann::json & result)
+nlohmann::json JSONRPCHandler::formatSuccess(const nlohmann::json & id, const nlohmann::json & result)
 {
-  return {
-    {"jsonrpc", "2.0"},
-    {"id", id},
-    {"result", result}
-  };
+  return {{"jsonrpc", "2.0"}, {"id", id}, {"result", result}};
 }
 
 nlohmann::json JSONRPCHandler::formatError(
-  const nlohmann::json & id,
-  int code,
-  const std::string & message,
-  const nlohmann::json & data)
+  const nlohmann::json & id, int code, const std::string & message, const nlohmann::json & data)
 {
-  nlohmann::json error = {
-    {"code", code},
-    {"message", message}
-  };
+  nlohmann::json error = {{"code", code}, {"message", message}};
 
   if (!data.is_null()) {
     error["data"] = data;
   }
 
-  return {
-    {"jsonrpc", "2.0"},
-    {"id", id},
-    {"error", error}
-  };
+  return {{"jsonrpc", "2.0"}, {"id", id}, {"error", error}};
 }
 
 }  // namespace robot_mcp::http

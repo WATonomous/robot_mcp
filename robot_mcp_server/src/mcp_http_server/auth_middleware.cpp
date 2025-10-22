@@ -23,8 +23,7 @@ namespace robot_mcp::http
 
 AuthMiddleware::AuthMiddleware(const std::optional<std::string> & api_key)
 : api_key_(api_key)
-{
-}
+{}
 
 bool AuthMiddleware::validate(const httplib::Request & req) const
 {
@@ -42,9 +41,7 @@ bool AuthMiddleware::validate(const httplib::Request & req) const
 
   // Expected format: "Bearer <api_key>"
   const std::string bearer_prefix = "Bearer ";
-  if (auth_header.size() < bearer_prefix.size() ||
-      auth_header.substr(0, bearer_prefix.size()) != bearer_prefix)
-  {
+  if (auth_header.size() < bearer_prefix.size() || auth_header.substr(0, bearer_prefix.size()) != bearer_prefix) {
     return false;
   }
 

@@ -27,17 +27,19 @@
 #include "robot_mcp_server/mcp_config/config_types.hpp"
 
 // Forward declarations for httplib.h
-namespace httplib {
+namespace httplib
+{
 class Server;
 struct Request;
 struct Response;
 }  // namespace httplib
 
 // Forward declaractions for mcp http server components
-namespace robot_mcp::http {
+namespace robot_mcp::http
+{
 class AuthMiddleware;
 class JSONRPCHandler;
-} // namespace robot_mcp::http
+}  // namespace robot_mcp::http
 
 namespace robot_mcp::http
 {
@@ -97,7 +99,10 @@ public:
    * @brief Check if server is running
    * @return true if server is running, false otherwise
    */
-  bool isRunning() const { return running_.load(); }
+  bool isRunning() const
+  {
+    return running_.load();
+  }
 
 private:
   /**

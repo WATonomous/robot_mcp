@@ -60,9 +60,7 @@ void HTTPServer::start(const config::ServerConfig & config, RequestHandler handl
   // Create server (HTTP or HTTPS based on runtime configuration)
   if (config.enable_https) {
     RCLCPP_INFO(logger_, "Creating HTTPS server with SSL/TLS support");
-    server_ = std::make_unique<httplib::SSLServer>(
-      config.ssl_cert_path.c_str(),
-      config.ssl_key_path.c_str());
+    server_ = std::make_unique<httplib::SSLServer>(config.ssl_cert_path.c_str(), config.ssl_key_path.c_str());
   } else {
     server_ = std::make_unique<httplib::Server>();
   }
@@ -72,26 +70,22 @@ void HTTPServer::start(const config::ServerConfig & config, RequestHandler handl
   json_rpc_ = std::make_unique<JSONRPCHandler>();
 
   // Configure server
-  server_->new_task_queue = [config] {
-    return new httplib::ThreadPool(config.thread_pool_size);
-  };
+  server_->new_task_queue = [config] { return new httplib::ThreadPool(config.thread_pool_size); };
 
   // Register POST /mcp endpoint
-  server_->Post("/mcp", [this](const httplib::Request & req, httplib::Response & res) {
-    this->handleMCPEndpoint(req, res);
-  });
+  server_->Post(
+    "/mcp", [this](const httplib::Request & req, httplib::Response & res) { this->handleMCPEndpoint(req, res); });
 
   // Register OPTIONS /mcp endpoint for CORS preflight
-  server_->Options("/mcp", [this](const httplib::Request & req, httplib::Response & res) {
-    this->handleMCPEndpoint(req, res);
-  });
+  server_->Options(
+    "/mcp", [this](const httplib::Request & req, httplib::Response & res) { this->handleMCPEndpoint(req, res); });
 
   // Start server in background thread
   running_.store(true);
   server_thread_ = std::thread(&HTTPServer::serverThreadFunc, this);
 
   // Log server status
-  const char* protocol = config.enable_https ? "HTTPS" : "HTTP";
+  const char * protocol = config.enable_https ? "HTTPS" : "HTTP";
   RCLCPP_INFO(logger_, "%s server started on %s:%d", protocol, host_.c_str(), port_);
   if (config.enable_https) {
     RCLCPP_INFO(logger_, "SSL/TLS: ENABLED (cert: %s)", config.ssl_cert_path.c_str());
@@ -151,9 +145,7 @@ void HTTPServer::handleMCPEndpoint(const httplib::Request & req, httplib::Respon
   if (!auth_->validate(req)) {
     RCLCPP_WARN(logger_, "Authentication failed for request from %s", req.remote_addr.c_str());
     res.status = 401;
-    res.set_content(
-      R"({"error": "Unauthorized - valid API key required"})",
-      "application/json");
+    res.set_content(R"({"error": "Unauthorized - valid API key required"})", "application/json");
     return;
   }
 
@@ -164,10 +156,7 @@ void HTTPServer::handleMCPEndpoint(const httplib::Request & req, httplib::Respon
   } catch (const nlohmann::json::parse_error & e) {
     RCLCPP_WARN(logger_, "JSON parse error: %s", e.what());
     auto error_response = JSONRPCHandler::formatError(
-      nlohmann::json(nullptr),
-      JSONRPCHandler::PARSE_ERROR,
-      "Parse error: Invalid JSON",
-      e.what());
+      nlohmann::json(nullptr), JSONRPCHandler::PARSE_ERROR, "Parse error: Invalid JSON", e.what());
     res.status = 400;
     res.set_content(error_response.dump(), "application/json");
     return;
@@ -196,11 +185,7 @@ void HTTPServer::handleMCPEndpoint(const httplib::Request & req, httplib::Respon
     res.status = 200;
   } catch (const std::exception & e) {
     RCLCPP_ERROR(logger_, "Request handler error: %s", e.what());
-    response = JSONRPCHandler::formatError(
-      request_id,
-      JSONRPCHandler::INTERNAL_ERROR,
-      "Internal error",
-      e.what());
+    response = JSONRPCHandler::formatError(request_id, JSONRPCHandler::INTERNAL_ERROR, "Internal error", e.what());
     res.status = 500;
   }
 
@@ -222,10 +207,7 @@ void HTTPServer::serverThreadFunc()
   bool success = server_->listen(host_.c_str(), port_);
 
   if (!success && running_.load()) {
-    RCLCPP_ERROR(
-      logger_,
-      "Server failed to listen on %s:%d - port may be in use",
-      host_.c_str(), port_);
+    RCLCPP_ERROR(logger_, "Server failed to listen on %s:%d - port may be in use", host_.c_str(), port_);
   }
 
   RCLCPP_DEBUG(logger_, "Server thread exiting");

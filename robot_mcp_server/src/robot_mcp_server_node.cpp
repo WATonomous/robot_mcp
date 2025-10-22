@@ -123,15 +123,12 @@ CallbackReturn MCPServerNode::on_activate(const rclcpp_lifecycle::State & /*stat
     http_server_ = std::make_unique<http::HTTPServer>(get_logger());
 
     // Bind request handler (placeholder for Phase 2)
-    auto handler = [this](const nlohmann::json & req) {
-      return this->handleMCPRequest(req);
-    };
+    auto handler = [this](const nlohmann::json & req) { return this->handleMCPRequest(req); };
 
     http_server_->start(config_.server, handler);
 
     RCLCPP_INFO(
-      get_logger(), "MCP server activated successfully on %s:%d",
-      config_.server.host.c_str(), config_.server.port);
+      get_logger(), "MCP server activated successfully on %s:%d", config_.server.host.c_str(), config_.server.port);
 
     return CallbackReturn::SUCCESS;
   } catch (const std::exception & e) {
@@ -248,12 +245,7 @@ nlohmann::json MCPServerNode::handleMCPRequest(const nlohmann::json & request)
     {"message", "MCP server Phase 2 complete - HTTP layer working"},
     {"method", method},
     {"note", "Actual MCP protocol implementation coming in Phase 3"},
-    {"server_info", {
-      {"name", "robot_mcp_server"},
-      {"version", "0.1.0"},
-      {"phase", 2}
-    }}
-  };
+    {"server_info", {{"name", "robot_mcp_server"}, {"version", "0.1.0"}, {"phase", 2}}}};
 }
 
 void MCPServerNode::setup_bond()
@@ -266,10 +258,7 @@ void MCPServerNode::setup_bond()
   RCLCPP_INFO(get_logger(), "Setting up bond connection for lifecycle manager...");
 
   // Create bond with lifecycle manager
-  bond_ = std::make_unique<bond::Bond>(
-    "/bond",
-    get_name(),
-    shared_from_this());
+  bond_ = std::make_unique<bond::Bond>("/bond", get_name(), shared_from_this());
 
   // Configure bond parameters from config
   bond_->setHeartbeatPeriod(config_.server.bond_heartbeat_period);

@@ -19,7 +19,8 @@
 #include <string>
 
 // Forward declare httplib types to avoid including the header here
-namespace httplib {
+namespace httplib
+{
 struct Request;
 }
 
@@ -56,7 +57,10 @@ public:
    * @brief Check if authentication is enabled
    * @return true if API key is configured, false otherwise
    */
-  bool isEnabled() const { return api_key_.has_value(); }
+  bool isEnabled() const
+  {
+    return api_key_.has_value();
+  }
 
 private:
   std::optional<std::string> api_key_;

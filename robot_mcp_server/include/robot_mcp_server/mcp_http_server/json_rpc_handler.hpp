@@ -15,8 +15,9 @@
 #ifndef ROBOT_MCP_HTTP_SERVER__JSON_RPC_HANDLER_HPP_
 #define ROBOT_MCP_HTTP_SERVER__JSON_RPC_HANDLER_HPP_
 
-#include <nlohmann/json.hpp>
 #include <string>
+
+#include <nlohmann/json.hpp>
 
 namespace robot_mcp::http
 {
@@ -56,9 +57,7 @@ public:
    * @param result Result data
    * @return JSON-RPC success response
    */
-  static nlohmann::json formatSuccess(
-    const nlohmann::json & id,
-    const nlohmann::json & result);
+  static nlohmann::json formatSuccess(const nlohmann::json & id, const nlohmann::json & result);
 
   /**
    * @brief Format JSON-RPC error response
@@ -70,21 +69,18 @@ public:
    * @return JSON-RPC error response
    */
   static nlohmann::json formatError(
-    const nlohmann::json & id,
-    int code,
-    const std::string & message,
-    const nlohmann::json & data = nullptr);
+    const nlohmann::json & id, int code, const std::string & message, const nlohmann::json & data = nullptr);
 
   /**
    * @brief Standard JSON-RPC error codes
    */
   enum ErrorCode
   {
-    PARSE_ERROR = -32700,       ///< Invalid JSON
-    INVALID_REQUEST = -32600,   ///< Invalid JSON-RPC structure
+    PARSE_ERROR = -32700,  ///< Invalid JSON
+    INVALID_REQUEST = -32600,  ///< Invalid JSON-RPC structure
     METHOD_NOT_FOUND = -32601,  ///< Method doesn't exist
-    INVALID_PARAMS = -32602,    ///< Invalid method parameters
-    INTERNAL_ERROR = -32603     ///< Internal JSON-RPC error
+    INVALID_PARAMS = -32602,  ///< Invalid method parameters
+    INTERNAL_ERROR = -32603  ///< Internal JSON-RPC error
   };
 };
 

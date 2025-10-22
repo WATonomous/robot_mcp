@@ -39,11 +39,13 @@
 #include "robot_mcp_server/mcp_config/config_types.hpp"
 
 // Forward declarations
-namespace robot_mcp::http {
+namespace robot_mcp::http
+{
 class HTTPServer;
 }
 
-namespace bond {
+namespace bond
+{
 class Bond;
 }
 

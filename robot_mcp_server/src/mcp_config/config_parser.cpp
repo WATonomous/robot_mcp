@@ -305,12 +305,10 @@ void ConfigParser::validate(const MCPServerConfig & config)
   // Validate HTTPS configuration
   if (config.server.enable_https) {
     if (config.server.ssl_cert_path.empty()) {
-      throw ConfigParseException(
-        "HTTPS is enabled but ssl_cert_path is not specified");
+      throw ConfigParseException("HTTPS is enabled but ssl_cert_path is not specified");
     }
     if (config.server.ssl_key_path.empty()) {
-      throw ConfigParseException(
-        "HTTPS is enabled but ssl_key_path is not specified");
+      throw ConfigParseException("HTTPS is enabled but ssl_key_path is not specified");
     }
   }
 

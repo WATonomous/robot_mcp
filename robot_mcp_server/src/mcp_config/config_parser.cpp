@@ -76,6 +76,7 @@ ServerConfig ConfigParser::parseServerConfig(rclcpp_lifecycle::LifecycleNode::Sh
   // Required parameters with defaults
   config.host = node->declare_parameter("server.host", config.host);
   config.port = node->declare_parameter("server.port", config.port);
+  config.thread_pool_size = node->declare_parameter("server.thread_pool_size", config.thread_pool_size);
   config.max_connections = node->declare_parameter("server.max_connections", config.max_connections);
   config.timeout_ms = node->declare_parameter("server.timeout_ms", config.timeout_ms);
   config.enable_cors = node->declare_parameter("server.enable_cors", config.enable_cors);

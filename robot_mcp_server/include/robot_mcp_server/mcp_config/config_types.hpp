@@ -55,6 +55,7 @@ struct ServerConfig
   std::string host{"0.0.0.0"};  ///< Server host address
   int port{8080};  ///< Server port number
   std::optional<std::string> api_key;  ///< Optional API key for authentication
+  int thread_pool_size{10};  ///< HTTP server thread pool size
   int max_connections{100};  ///< Maximum concurrent connections
   int timeout_ms{30000};  ///< Request timeout in milliseconds
   bool enable_cors{true};  ///< Enable CORS headers

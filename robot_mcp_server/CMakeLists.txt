@@ -39,6 +39,9 @@ set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(${PROJECT_NAME} SHARED
   src/robot_mcp_server_node.cpp
   src/mcp_config/config_parser.cpp
+  src/mcp_http_server/auth_middleware.cpp
+  src/mcp_http_server/json_rpc_handler.cpp
+  src/mcp_http_server/http_server.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${include_dir}>

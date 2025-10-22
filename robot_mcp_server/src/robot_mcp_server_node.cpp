@@ -32,6 +32,7 @@
 #include <string>
 
 #include "robot_mcp_server/mcp_config/config_parser.hpp"
+#include "robot_mcp_server/mcp_http_server/http_server.hpp"
 
 namespace robot_mcp
 {
@@ -93,12 +94,22 @@ CallbackReturn MCPServerNode::on_activate(const rclcpp_lifecycle::State & /*stat
   RCLCPP_INFO(get_logger(), "Activating MCP server...");
 
   try {
-    // TODO(eddy): Initialize plugin system
-    // TODO(eddy): Start HTTP server
-    // TODO(eddy): Initialize router
+    // TODO(Phase 4): Initialize plugin system
+    // TODO(Phase 3): Initialize router
+
+    // Create and start HTTP server
+    http_server_ = std::make_unique<http::HTTPServer>(get_logger());
+
+    // Bind request handler (placeholder for Phase 2)
+    auto handler = [this](const nlohmann::json & req) {
+      return this->handleMCPRequest(req);
+    };
+
+    http_server_->start(config_.server, handler);
 
     RCLCPP_INFO(
-      get_logger(), "MCP server activated successfully on %s:%d", config_.server.host.c_str(), config_.server.port);
+      get_logger(), "MCP server activated successfully on %s:%d",
+      config_.server.host.c_str(), config_.server.port);
 
     return CallbackReturn::SUCCESS;
   } catch (const std::exception & e) {
@@ -112,9 +123,13 @@ CallbackReturn MCPServerNode::on_deactivate(const rclcpp_lifecycle::State & /*st
   RCLCPP_INFO(get_logger(), "Deactivating MCP server...");
 
   try {
-    // TODO(eddy): Stop HTTP server
-    // TODO(eddy): Cancel all active operations
-    // TODO(eddy): Keep plugins loaded
+    // Stop HTTP server
+    if (http_server_) {
+      http_server_->stop();
+    }
+
+    // TODO(Phase 3): Cancel all active operations
+    // TODO(Phase 4): Keep plugins loaded
 
     RCLCPP_INFO(get_logger(), "MCP server deactivated successfully");
 
@@ -131,9 +146,11 @@ CallbackReturn MCPServerNode::on_cleanup(const rclcpp_lifecycle::State & /*state
   RCLCPP_INFO(get_logger(), "Cleaning up MCP server...");
 
   try {
-    // TODO(eddy): Unload all plugins
-    // TODO(eddy): Clear router
-    // TODO(eddy): Release HTTP server resources
+    // Release HTTP server resources
+    http_server_.reset();
+
+    // TODO(Phase 4): Unload all plugins
+    // TODO(Phase 3): Clear router
 
     // Clear configuration
     config_ = config::MCPServerConfig{};
@@ -154,9 +171,13 @@ CallbackReturn MCPServerNode::on_shutdown(const rclcpp_lifecycle::State & /*stat
 
   try {
     // Perform emergency stop
-    // TODO(eddy): Stop HTTP server immediately
-    // TODO(eddy): Cancel all operations
-    // TODO(eddy): Unload plugins
+    if (http_server_) {
+      http_server_->stop();
+      http_server_.reset();
+    }
+
+    // TODO(Phase 3): Cancel all operations
+    // TODO(Phase 4): Unload plugins
 
     RCLCPP_INFO(get_logger(), "MCP server shutdown completed");
 
@@ -166,6 +187,28 @@ CallbackReturn MCPServerNode::on_shutdown(const rclcpp_lifecycle::State & /*stat
     // Always return success for shutdown
     return CallbackReturn::SUCCESS;
   }
+}
+
+nlohmann::json MCPServerNode::handleMCPRequest(const nlohmann::json & request)
+{
+  // Phase 2 placeholder: Return "not implemented" for all requests
+  // This will be replaced by MCPRouter in Phase 3
+
+  std::string method = request.value("method", "unknown");
+
+  RCLCPP_INFO(get_logger(), "Received MCP request: %s (placeholder handler)", method.c_str());
+
+  // Return a basic response indicating Phase 2 completion
+  return {
+    {"message", "MCP server Phase 2 complete - HTTP layer working"},
+    {"method", method},
+    {"note", "Actual MCP protocol implementation coming in Phase 3"},
+    {"server_info", {
+      {"name", "robot_mcp_server"},
+      {"version", "0.1.0"},
+      {"phase", 2}
+    }}
+  };
 }
 
 }  // namespace robot_mcp

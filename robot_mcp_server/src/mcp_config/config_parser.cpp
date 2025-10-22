@@ -91,9 +91,10 @@ ServerConfig ConfigParser::parseServerConfig(rclcpp_lifecycle::LifecycleNode::Sh
   config.bond_timeout = node->declare_parameter("server.bond_timeout", config.bond_timeout);
   config.bond_heartbeat_period = node->declare_parameter("server.bond_heartbeat_period", config.bond_heartbeat_period);
 
-  // Optional API key
-  if (node->has_parameter("server.api_key")) {
-    config.api_key = node->get_parameter("server.api_key").as_string();
+  // Optional API key - declare with empty string default
+  std::string api_key_str = node->declare_parameter("server.api_key", std::string(""));
+  if (!api_key_str.empty()) {
+    config.api_key = api_key_str;
   }
 
   return config;

@@ -132,6 +132,10 @@ if(BUILD_TESTING)
   add_launch_test(
     test/launch_tests/test_http_integration.py
   )
+
+  add_launch_test(
+    test/launch_tests/test_authentication.py
+  )
 endif()
 
 ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)

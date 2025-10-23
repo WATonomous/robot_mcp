@@ -39,7 +39,7 @@ def generate_test_description():
         namespace="",
         parameters=[
             {
-                "server.host": "127.0.0.1",
+                "server.host": "127.0.0.2",
                 "server.port": 18081,
                 "server.api_key": test_api_key,
                 "server.enable_https": False,
@@ -71,7 +71,7 @@ def generate_test_description():
 class TestAuthentication(unittest.TestCase):
     """Active tests for authentication."""
 
-    BASE_URL = "http://127.0.0.1:18081"
+    BASE_URL = "http://127.0.0.2:18081"
     VALID_API_KEY = "test_secret_key_12345"
 
     @classmethod

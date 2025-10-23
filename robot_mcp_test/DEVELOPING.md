@@ -36,3 +36,8 @@ The `add_robot_mcp_test()` function automatically:
 - Links ROS dependencies (rclcpp, rclcpp_lifecycle)
 - Configures ament test registration
 - Sets up JUnit XML output
+
+The `add_robot_mcp_launch_test()` function automatically:
+- Links up test utility files within `test/launch_tests` directory of a project
+- Run the ROS `add_launch_test` function
+ 

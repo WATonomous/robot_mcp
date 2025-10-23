@@ -18,7 +18,6 @@
 import os
 import shutil
 import subprocess
-import time
 import unittest
 
 import launch
@@ -27,6 +26,8 @@ import launch_ros.actions
 import launch_testing.actions
 import pytest
 import requests
+
+from test_utils import wait_for_server
 
 
 def generate_test_certificates():
@@ -118,7 +119,7 @@ class TestHTTPS(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Wait for server to be ready."""
-        time.sleep(5)
+        wait_for_server(cls.BASE_URL, verify=False)
 
     @classmethod
     def tearDownClass(cls):

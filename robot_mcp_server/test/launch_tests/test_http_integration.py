@@ -15,7 +15,6 @@
 
 """Integration test for HTTP server and MCP endpoint."""
 
-import time
 import unittest
 import requests
 
@@ -25,6 +24,8 @@ from launch.actions import TimerAction
 from launch_testing.actions import ReadyToTest
 
 import pytest
+
+from test_utils import wait_for_server
 
 
 def generate_test_description():
@@ -73,11 +74,13 @@ class TestHTTPIntegration(unittest.TestCase):
 
     BASE_URL = "http://127.0.0.1:18080"
 
+    @classmethod
+    def setUpClass(cls):
+        """Wait for server to be ready."""
+        wait_for_server(cls.BASE_URL)
+
     def test_server_responds_to_valid_jsonrpc_request(self):
         """Test server responds with valid JSON-RPC response."""
-
-        # Give server time to start
-        time.sleep(1.0)
 
         # Send valid JSON-RPC request
         payload = {
@@ -113,9 +116,6 @@ class TestHTTPIntegration(unittest.TestCase):
 
     def test_server_rejects_invalid_json(self):
         """Test server returns error for malformed JSON."""
-
-        time.sleep(1.0)
-
         # Send invalid JSON
         response = requests.post(
             f"{self.BASE_URL}/mcp",
@@ -133,9 +133,6 @@ class TestHTTPIntegration(unittest.TestCase):
 
     def test_server_rejects_invalid_jsonrpc_structure(self):
         """Test server returns error for invalid JSON-RPC structure."""
-
-        time.sleep(1.0)
-
         # Send JSON missing required fields
         payload = {
             "method": "test",
@@ -159,9 +156,6 @@ class TestHTTPIntegration(unittest.TestCase):
 
     def test_server_handles_cors_preflight(self):
         """Test server handles CORS preflight OPTIONS request."""
-
-        time.sleep(1.0)
-
         # Send OPTIONS request
         response = requests.options(
             f"{self.BASE_URL}/mcp",
@@ -181,9 +175,6 @@ class TestHTTPIntegration(unittest.TestCase):
 
     def test_server_handles_multiple_requests(self):
         """Test server can handle multiple concurrent requests."""
-
-        time.sleep(1.0)
-
         # Send multiple requests with different IDs
         responses = []
         for i in range(5):
@@ -205,9 +196,6 @@ class TestHTTPIntegration(unittest.TestCase):
 
     def test_server_responds_with_null_id(self):
         """Test server handles requests with null id."""
-
-        time.sleep(1.0)
-
         payload = {"jsonrpc": "2.0", "method": "test", "id": None}
 
         response = requests.post(

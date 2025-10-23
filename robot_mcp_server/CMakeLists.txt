@@ -91,17 +91,18 @@ install(DIRECTORY include/
   DESTINATION include
 )
 
-# Install test configuration files
-install(DIRECTORY test/launch_tests/
-  DESTINATION share/${PROJECT_NAME}/test/launch_tests
-  FILES_MATCHING
-  PATTERN "*.yaml"
-)
-
 if(BUILD_TESTING)
   # Find robot_mcp_test package
   find_package(robot_mcp_test REQUIRED)
   find_package(launch_testing_ament_cmake REQUIRED)
+
+  # Install test configuration files and test utilities
+  install(DIRECTORY test/launch_tests/
+    DESTINATION share/${PROJECT_NAME}/test/launch_tests
+    FILES_MATCHING
+    PATTERN "*.yaml"
+    PATTERN "test_utils.py"
+  )
 
   # Include the custom test function
   include(${robot_mcp_test_DIR}/add_robot_mcp_test.cmake)
@@ -120,26 +121,12 @@ if(BUILD_TESTING)
       ${PROJECT_NAME}
   )
 
-  # Add launch tests
-  add_launch_test(
-    test/launch_tests/test_complete_config.py
-  )
-
-  add_launch_test(
-    test/launch_tests/test_minimal_config.py
-  )
-
-  add_launch_test(
-    test/launch_tests/test_http_integration.py
-  )
-
-  add_launch_test(
-    test/launch_tests/test_authentication.py
-  )
-
-  add_launch_test(
-    test/launch_tests/test_https.py
-  )
+  # Add launch tests with test_utils support
+  add_robot_mcp_launch_test(test/launch_tests/test_complete_config.py)
+  add_robot_mcp_launch_test(test/launch_tests/test_minimal_config.py)
+  add_robot_mcp_launch_test(test/launch_tests/test_http_integration.py)
+  add_robot_mcp_launch_test(test/launch_tests/test_authentication.py)
+  add_robot_mcp_launch_test(test/launch_tests/test_https.py)
 endif()
 
 ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)

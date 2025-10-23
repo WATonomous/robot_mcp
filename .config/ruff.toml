@@ -1,0 +1,22 @@
+# Ruff configuration for robot_mcp
+# https://docs.astral.sh/ruff/configuration/
+
+# Use 2 spaces for indentation (ROS2 Python convention)
+indent-width = 2
+
+# Line length (default is 88, can adjust if needed)
+line-length = 100
+
+[format]
+# Use spaces for indentation
+indent-style = "space"
+
+# Use double quotes for strings
+quote-style = "double"
+
+[lint]
+# Enable pycodestyle (E), Pyflakes (F), and isort (I) rules
+select = ["E", "F", "I"]
+
+# Ignore specific rules if needed
+ignore = []

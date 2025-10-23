@@ -32,8 +32,9 @@ repos:
     rev: v0.11.5
     hooks:
       - id: ruff-format
+        args: [--config, .config/ruff.toml]
       - id: ruff
-        args: [--fix]
+        args: [--fix, --config, .config/ruff.toml]
 
   # C++ formatting
   - repo: https://github.com/pre-commit/mirrors-clang-format

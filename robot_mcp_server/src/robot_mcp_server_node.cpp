@@ -149,7 +149,12 @@ CallbackReturn MCPServerNode::on_deactivate(const rclcpp_lifecycle::State & /*st
 
     // Stop bond heartbeat
     if (bond_) {
-      bond_->breakBond();
+      try {
+        bond_->breakBond();
+      } catch (const std::exception & e) {
+        // Bond breaking may fail if RCL context is already shut down during SIGINT
+        RCLCPP_DEBUG(get_logger(), "Bond break failed (context may be shut down): %s", e.what());
+      }
       bond_.reset();
       RCLCPP_INFO(get_logger(), "Bond heartbeat stopped");
     }

@@ -78,6 +78,7 @@ struct TopicConfig
   std::string topic;  ///< ROS2 topic name
   std::string msg_type;  ///< ROS2 message type (e.g., "std_msgs/msg/String")
   std::string plugin;  ///< Plugin class name
+  std::string description;  ///< Human-readable description for MCP tools/resources list
   bool subscribe{true};  ///< Subscribe and cache messages
   bool publish{true};  ///< Allow publishing to this topic
   std::vector<std::string> resource_groups;  ///< Resource groups this topic belongs to
@@ -92,6 +93,7 @@ struct ServiceConfig
   std::string service;  ///< ROS2 service name
   std::string srv_type;  ///< ROS2 service type
   std::string plugin;  ///< Plugin class name
+  std::string description;  ///< Human-readable description for MCP tools list
   int timeout_ms{5000};  ///< Service call timeout
   std::vector<std::string> resource_groups;  ///< Resource groups this service belongs to
 };
@@ -105,6 +107,7 @@ struct ActionConfig
   std::string action;  ///< ROS2 action name
   std::string action_type;  ///< ROS2 action type
   std::string plugin;  ///< Plugin class name
+  std::string description;  ///< Human-readable description for MCP tools list
   int timeout_ms{0};  ///< Action timeout (0 = no timeout)
   bool cancellable{true};  ///< Whether action can be cancelled
   std::vector<std::string> resource_groups;  ///< Resource groups this action belongs to

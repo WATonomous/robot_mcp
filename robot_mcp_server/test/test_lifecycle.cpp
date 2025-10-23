@@ -31,7 +31,6 @@
 #include <string>
 #include <thread>
 
-#include <catch2/catch.hpp>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <rclcpp/rclcpp.hpp>

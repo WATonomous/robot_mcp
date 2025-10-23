@@ -19,9 +19,8 @@
 #include <thread>
 #include <vector>
 
-#include <catch2/catch.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <robot_mcp_test/robot_mcp_test.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
 
 #include "test_nodes/publisher_test_node.hpp"

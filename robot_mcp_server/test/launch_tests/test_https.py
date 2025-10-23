@@ -26,7 +26,6 @@ import launch_ros.actions
 import launch_testing.actions
 import pytest
 import requests
-
 from test_utils import wait_for_server
 
 

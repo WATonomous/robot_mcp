@@ -28,21 +28,22 @@
 
 import os
 import unittest
-import pytest
+
 import launch
 import launch.actions
 import launch_ros.actions
+import launch_ros.event_handlers
 import launch_ros.events
 import launch_ros.events.lifecycle
-import launch_ros.event_handlers
 import launch_testing.actions
-import launch_testing.markers
 import launch_testing.asserts
-from lifecycle_msgs.msg import Transition
-from ament_index_python.packages import get_package_share_directory
+import launch_testing.markers
+import pytest
 import rclpy
-from rclpy.node import Node
+from ament_index_python.packages import get_package_share_directory
+from lifecycle_msgs.msg import Transition
 from rcl_interfaces.srv import GetParameters
+from rclpy.node import Node
 
 
 @pytest.mark.launch_test

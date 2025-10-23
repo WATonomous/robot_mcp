@@ -16,15 +16,13 @@
 """Integration test for HTTP server and MCP endpoint."""
 
 import unittest
-import requests
-
-from launch import LaunchDescription
-from launch_ros.actions import LifecycleNode, Node
-from launch.actions import TimerAction
-from launch_testing.actions import ReadyToTest
 
 import pytest
-
+import requests
+from launch import LaunchDescription
+from launch.actions import TimerAction
+from launch_ros.actions import LifecycleNode, Node
+from launch_testing.actions import ReadyToTest
 from test_utils import wait_for_server
 
 

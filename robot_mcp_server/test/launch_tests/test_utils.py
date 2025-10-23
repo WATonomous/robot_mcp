@@ -16,6 +16,7 @@
 """Shared utilities for launch tests."""
 
 import time
+
 import requests
 
 
@@ -41,7 +42,7 @@ def wait_for_server(
   """
   for attempt in range(max_attempts):
     try:
-      response = requests.post(
+      requests.post(
         f"{base_url}/mcp",
         json={"jsonrpc": "2.0", "method": "ping", "id": 0},
         timeout=timeout,

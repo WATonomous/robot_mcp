@@ -20,39 +20,37 @@ import requests
 
 
 def wait_for_server(
-    base_url,
-    max_attempts=50,
-    timeout=0.5,
-    verify=True,
-    headers=None,
+  base_url,
+  max_attempts=50,
+  timeout=0.5,
+  verify=True,
+  headers=None,
 ):
-    """Poll server until ready with exponential backoff.
+  """Poll server until ready with exponential backoff.
 
-    Args:
-        base_url: Base URL of the server (e.g., "http://127.0.0.1:8080")
-        max_attempts: Maximum number of connection attempts
-        timeout: Timeout in seconds for each request
-        verify: Whether to verify SSL certificates (False for self-signed certs)
-        headers: Optional headers to send with the request (e.g., for auth)
+  Args:
+    base_url: Base URL of the server (e.g., "http://127.0.0.1:8080")
+    max_attempts: Maximum number of connection attempts
+    timeout: Timeout in seconds for each request
+    verify: Whether to verify SSL certificates (False for self-signed certs)
+    headers: Optional headers to send with the request (e.g., for auth)
 
-    Raises:
-        RuntimeError: If server does not respond after max_attempts
+  Raises:
+    RuntimeError: If server does not respond after max_attempts
 
-    """
-    for attempt in range(max_attempts):
-        try:
-            response = requests.post(
-                f"{base_url}/mcp",
-                json={"jsonrpc": "2.0", "method": "ping", "id": 0},
-                timeout=timeout,
-                verify=verify,
-                headers=headers or {},
-            )
-            # Server is responding, we're ready
-            return
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            if attempt == max_attempts - 1:
-                raise RuntimeError(
-                    f"Server at {base_url} did not start after {max_attempts * 0.1}s"
-                )
-            time.sleep(0.1)
+  """
+  for attempt in range(max_attempts):
+    try:
+      response = requests.post(
+        f"{base_url}/mcp",
+        json={"jsonrpc": "2.0", "method": "ping", "id": 0},
+        timeout=timeout,
+        verify=verify,
+        headers=headers or {},
+      )
+      # Server is responding, we're ready
+      return
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+      if attempt == max_attempts - 1:
+        raise RuntimeError(f"Server at {base_url} did not start after {max_attempts * 0.1}s")
+      time.sleep(0.1)

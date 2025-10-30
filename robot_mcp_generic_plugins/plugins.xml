@@ -1,0 +1,25 @@
+<library path="robot_mcp_generic_plugins">
+  <!-- GenericTopicPlugin: Available in ALL ROS2 distros (Humble, Jazzy, Rolling+) -->
+  <class type="robot_mcp_generic_plugins::GenericTopicPlugin"
+         base_class_type="robot_mcp_msg_pluginlib::MessagePlugin">
+    <description>
+      Generic plugin for all ROS2 topic types using runtime introspection.
+      Works for: geometry_msgs, nav_msgs, std_msgs, sensor_msgs (except Image/PointCloud).
+      Use specialized plugins for images and point clouds.
+    </description>
+  </class>
+
+  <!-- GenericServicePlugin: Only available in Jazzy/Rolling+ (requires GenericClient)
+       Not compiled in Humble - will cause pluginlib error if referenced in Humble -->
+  <class type="robot_mcp_generic_plugins::GenericServicePlugin"
+         base_class_type="robot_mcp_msg_pluginlib::MessagePlugin">
+    <description>
+      Generic plugin for all ROS2 service types using GenericClient.
+      Only available in ROS2 Jazzy and Rolling (not available in Humble).
+    </description>
+  </class>
+
+  <!-- NOTE: Generic action plugin is NOT implemented
+       Generic action client API doesn't exist even in Jazzy/Rolling
+       For actions, you must create type-specific action plugins or wait for future implementation -->
+</library>

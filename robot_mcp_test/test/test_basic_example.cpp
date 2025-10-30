@@ -17,9 +17,8 @@
 #include <string>
 #include <thread>
 
-#include <catch2/catch.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <robot_mcp_test/robot_mcp_test.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <std_srvs/srv/set_bool.hpp>
 

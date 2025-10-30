@@ -14,8 +14,8 @@
 
 #include <string>
 
-#include <catch2/catch.hpp>
 #include <nlohmann/json.hpp>
+#include <robot_mcp_test/robot_mcp_test.hpp>
 
 #include "robot_mcp_server/mcp_http_server/json_rpc_handler.hpp"
 

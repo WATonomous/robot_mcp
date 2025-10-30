@@ -15,7 +15,14 @@
 #pragma once
 
 // Main header for robot_mcp_test library
-// Include this to access all robot_mcp_test functionality
+// Include this to access all robot_mcp_test functionality including Catch2
+
+// Cross-compatible Catch2 include for Ubuntu 22.04 (Catch2 v2) and Ubuntu 24.04 (Catch2 v3)
+#ifdef CATCH2_V3
+#include <catch2/catch_test_macros.hpp>
+#else
+#include <catch2/catch.hpp>
+#endif
 
 // Test fixtures
 #include "test_fixtures/test_executor_fixture.hpp"

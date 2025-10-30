@@ -12,7 +12,6 @@ A ROS 2 testing framework built on Catch2 that provides test fixtures and utilit
 ## Quick Start
 
 ```cpp
-#include <catch2/catch.hpp>
 #include <robot_mcp_test/robot_mcp_test.hpp>
 
 TEST_CASE_METHOD(robot_mcp::test::TestExecutorFixture, "My ROS Test", "[ros]") {

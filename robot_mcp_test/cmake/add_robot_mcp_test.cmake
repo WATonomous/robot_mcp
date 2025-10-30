@@ -31,10 +31,17 @@ function(add_robot_mcp_test TEST_NAME TEST_SOURCE)
     "LIBRARIES"   # Multi-value keywords
   )
 
-  # Find dependencies
-  find_package(Catch2 2 REQUIRED)
+  # Find dependencies (version-agnostic for Ubuntu 22.04/24.04 compatibility)
+  find_package(Catch2 REQUIRED)
   find_package(rclcpp REQUIRED)
   find_package(rclcpp_lifecycle REQUIRED)
+
+  # Detect Catch2 version and set compile definition
+  if(Catch2_VERSION VERSION_GREATER_EQUAL "3.0.0")
+    set(CATCH2_COMPILE_DEF "CATCH2_V3")
+  else()
+    set(CATCH2_COMPILE_DEF "CATCH2_V2")
+  endif()
 
   # Create the test executable
   add_executable(${TEST_NAME} ${TEST_SOURCE})
@@ -59,6 +66,9 @@ function(add_robot_mcp_test TEST_NAME TEST_SOURCE)
 
   # Add test include directory
   target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/test)
+
+  # Add Catch2 version compile definition for cross-compatibility
+  target_compile_definitions(${TEST_NAME} PRIVATE ${CATCH2_COMPILE_DEF})
 
   # Register the test with ament
   ament_add_test(

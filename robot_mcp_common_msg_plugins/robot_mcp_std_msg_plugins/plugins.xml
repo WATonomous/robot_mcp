@@ -1,9 +1,0 @@
-<library path="robot_mcp_std_msg_plugins">
-  <!-- Plugin implementations will be added in Phase 3 -->
-  <!-- Example:
-  <class type="robot_mcp_std_msg_plugins::StringPlugin"
-         base_class_type="robot_mcp_msg_pluginlib::MessagePlugin">
-    <description>Plugin for std_msgs/msg/String</description>
-  </class>
-  -->
-</library>
